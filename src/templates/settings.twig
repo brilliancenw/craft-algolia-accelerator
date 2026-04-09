@@ -1,0 +1,529 @@
+{% import '_includes/forms.twig' as forms %}
+
+<div class="readable" style="margin-bottom: 24px;">
+    <p>{{ 'Algolia Accelerator dramatically improves search performance by caching Algolia responses at the edge using Cloudflare Workers.'|t('algolia-accelerator') }}</p>
+    <p style="margin-bottom: 0;"><strong>{{ 'How it works:'|t('algolia-accelerator') }}</strong> {{ 'A Cloudflare Worker sits between your frontend and Algolia, caching search responses in Cloudflare KV storage. When content changes in Craft, this plugin automatically purges the cache so users always see fresh results.'|t('algolia-accelerator') }}</p>
+    <p style="margin-top: 8px; color: #666;"><strong>{{ 'Performance:'|t('algolia-accelerator') }}</strong> {{ 'Typical Algolia requests (300-500ms) are reduced to 2-10ms for cached responses.'|t('algolia-accelerator') }}</p>
+</div>
+
+<hr>
+
+{{ forms.lightswitchField({
+    label: 'Enable Cache Purging'|t('algolia-accelerator'),
+    instructions: 'When enabled, the cache will be automatically purged when entries in the configured sections are saved.'|t('algolia-accelerator'),
+    id: 'enabled',
+    name: 'enabled',
+    on: settings.enabled,
+}) }}
+
+<hr>
+
+<h2>{{ 'Worker Configuration'|t('algolia-accelerator') }}</h2>
+
+<details style="margin-bottom: 24px; border: 1px solid #e5a54b; border-radius: 4px; background: #fef6e8;">
+    <summary style="padding: 12px 16px; background: #fdf1db; cursor: pointer; font-weight: 600; color: #8a6d3b;">
+        {{ 'Prerequisite: DNS through Cloudflare'|t('algolia-accelerator') }}
+    </summary>
+    <div style="padding: 16px; border-top: 1px solid #e5a54b;">
+        <p style="margin-top: 0;">{{ "Your domain's DNS must be managed by Cloudflare before setting up the worker. If you haven't already, add your domain to Cloudflare and update your nameservers."|t('algolia-accelerator') }}</p>
+        <p style="margin-bottom: 0;"><a href="https://dash.cloudflare.com/" target="_blank" class="go">{{ 'Open Cloudflare Dashboard'|t('algolia-accelerator') }}</a></p>
+    </div>
+</details>
+
+<details style="margin-bottom: 24px; border: 1px solid #e0e0e0; border-radius: 4px;">
+    <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
+        {{ 'Step-by-Step Cloudflare Setup (no CLI required)'|t('algolia-accelerator') }}
+    </summary>
+    <div style="padding: 16px;">
+        <h4 style="margin-top: 0;">{{ 'Step 1: Create a KV Namespace (Cloudflare storage)'|t('algolia-accelerator') }}</h4>
+        <ol style="margin: 8px 0 16px 20px;">
+            <li>{{ 'Go to'|t('algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces" target="_blank">Workers & Pages → KV</a></li>
+            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Create a namespace</strong></li>
+            <li>{{ 'Name it'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ 'and click'|t('algolia-accelerator') }} <strong>Add</strong></li>
+            <li>{{ "You'll select this namespace in Step 3 when configuring KV bindings"|t('algolia-accelerator') }}</li>
+        </ol>
+
+        <h4>{{ 'Step 2: Create the Worker'|t('algolia-accelerator') }}</h4>
+        <ol style="margin: 8px 0 16px 20px;">
+            <li>{{ 'Go to'|t('algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers-and-pages/create/workers/new" target="_blank">Workers & Pages → Create</a></li>
+            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Create Worker</strong></li>
+            <li>{{ 'Name it'|t('algolia-accelerator') }} <code>algolia-cache-worker</code> {{ 'and click'|t('algolia-accelerator') }} <strong>Deploy</strong></li>
+            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Edit Code</strong></li>
+            <li>{{ 'Delete all the default code and paste the worker code below:'|t('algolia-accelerator') }}
+                <p style="margin: 8px 0; font-size: 12px; color: #666;">
+                    <em>{{ 'Click inside the box to select all code, then copy (Ctrl+C / Cmd+C)'|t('algolia-accelerator') }}</em>
+                </p>
+                <div style="margin-top: 8px;">
+                    <textarea id="worker-code" readonly style="width: 100%; height: 300px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical; cursor: pointer;">{% verbatim %}/**
+ * Algolia Cache Worker
+ *
+ * Cloudflare Worker that acts as a caching proxy for Algolia search requests.
+ * Caches search responses in Cloudflare KV with a configurable TTL to reduce
+ * API costs and dramatically improve performance.
+ *
+ * Response times: ~300-500ms (cache miss) -> ~2-10ms (cache hit)
+ */
+
+export interface Env {
+  SEARCH_CACHE: KVNamespace;
+  ALGOLIA_HOST: string;
+  ALGOLIA_APP_ID: string;
+  ALGOLIA_API_KEY: string;
+  PURGE_TOKEN?: string;
+  CACHE_TTL_SECONDS?: string;
+  ENVIRONMENT?: string;
+}
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, x-algolia-api-key, x-algolia-application-id"
+};
+
+/**
+ * Generate a cache key using FNV-1a hash
+ * Includes pathname to differentiate between different Algolia endpoints
+ */
+function generateCacheKey(requestBody: unknown, pathname: string): string {
+  function sortObject(obj: unknown): unknown {
+    if (obj === null || typeof obj !== "object") return obj;
+    if (Array.isArray(obj)) return obj.map(sortObject);
+    return Object.keys(obj as Record<string, unknown>).sort().reduce((acc: Record<string, unknown>, key: string) => {
+      acc[key] = sortObject((obj as Record<string, unknown>)[key]);
+      return acc;
+    }, {});
+  }
+
+  const normalized = pathname + JSON.stringify(sortObject(requestBody));
+  let hash = 2166136261;
+  for (let i = 0; i < normalized.length; i++) {
+    hash ^= normalized.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `search:${(hash >>> 0).toString(16)}`;
+}
+
+/**
+ * Forward request to Algolia API
+ * Preserves the original pathname to support all Algolia endpoints
+ */
+async function fetchFromAlgolia(requestBody: unknown, env: Env, pathname: string): Promise<unknown> {
+  const algoliaUrl = `https://${env.ALGOLIA_HOST}${pathname}`;
+  const response = await fetch(algoliaUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-algolia-api-key": env.ALGOLIA_API_KEY,
+      "x-algolia-application-id": env.ALGOLIA_APP_ID
+    },
+    body: JSON.stringify(requestBody)
+  });
+  if (!response.ok) {
+    throw new Error(`Algolia error: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Purge all cached search entries
+ */
+async function purgeCache(env: Env, ctx: ExecutionContext): Promise<{ success: boolean; deletedCount?: number; message?: string }> {
+  if (!env.SEARCH_CACHE) {
+    return { success: false, message: "Cache not configured" };
+  }
+  try {
+    const keys = await env.SEARCH_CACHE.list({ prefix: "search:" });
+    let deletedCount = 0;
+    for (const key of keys.keys) {
+      ctx.waitUntil(env.SEARCH_CACHE.delete(key.name));
+      deletedCount++;
+    }
+    let cursor = keys.cursor;
+    while (cursor) {
+      const moreKeys = await env.SEARCH_CACHE.list({ prefix: "search:", cursor });
+      for (const key of moreKeys.keys) {
+        ctx.waitUntil(env.SEARCH_CACHE.delete(key.name));
+        deletedCount++;
+      }
+      cursor = moreKeys.cursor;
+    }
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      action: "cache_purge",
+      deletedCount,
+      environment: env.ENVIRONMENT || "unknown"
+    }));
+    return { success: true, deletedCount };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+
+    // Handle CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    // Health check endpoint
+    if (url.pathname === "/health") {
+      return new Response(JSON.stringify({
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        environment: env.ENVIRONMENT || "unknown",
+        cacheConfigured: !!env.SEARCH_CACHE
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    // Handle purge requests
+    if (url.pathname === "/purge") {
+      const authHeader = request.headers.get("Authorization");
+      const purgeToken = env.PURGE_TOKEN;
+      if (purgeToken && authHeader !== `Bearer ${purgeToken}`) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+      const result = await purgeCache(env, ctx);
+      return new Response(JSON.stringify(result), {
+        status: result.success ? 200 : 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
+    // Only allow POST for search requests
+    if (request.method !== "POST") {
+      return new Response("Method not allowed", {
+        status: 405,
+        headers: corsHeaders
+      });
+    }
+
+    const startTime = Date.now();
+    const bypassCache = url.searchParams.get("nocache") === "true";
+
+    try {
+      const requestBody = await request.json();
+      const cacheKey = generateCacheKey(requestBody, url.pathname);
+
+      // Extract search info for logging
+      const searchInfo = {
+        queries: (requestBody as { requests?: unknown[] }).requests?.length || 0,
+        firstQuery: (requestBody as { requests?: Array<{ query?: string }>; query?: string }).requests?.[0]?.query || (requestBody as { query?: string }).query || "",
+        indexName: (requestBody as { requests?: Array<{ indexName?: string }> }).requests?.[0]?.indexName || ""
+      };
+
+      let responseData: unknown;
+      let cacheHit = false;
+
+      // Check cache first (unless bypassed)
+      if (!bypassCache && env.SEARCH_CACHE) {
+        const cached = await env.SEARCH_CACHE.get(cacheKey, "json");
+        if (cached) {
+          responseData = cached;
+          cacheHit = true;
+        }
+      }
+
+      // Fetch from Algolia if not cached
+      if (!responseData) {
+        responseData = await fetchFromAlgolia(requestBody, env, url.pathname);
+        if (env.SEARCH_CACHE && !bypassCache) {
+          const ttl = parseInt(env.CACHE_TTL_SECONDS || "86400") || 86400;
+          ctx.waitUntil(
+            env.SEARCH_CACHE.put(cacheKey, JSON.stringify(responseData), {
+              expirationTtl: ttl
+            })
+          );
+        }
+      }
+
+      const duration = Date.now() - startTime;
+
+      // Log request details
+      console.log(JSON.stringify({
+        timestamp: new Date().toISOString(),
+        cacheHit,
+        duration,
+        cacheKey,
+        pathname: url.pathname,
+        query: searchInfo.firstQuery,
+        indexName: searchInfo.indexName,
+        queryCount: searchInfo.queries,
+        environment: env.ENVIRONMENT || "unknown",
+        userAgent: request.headers.get("user-agent")?.substring(0, 100)
+      }));
+
+      return new Response(JSON.stringify(responseData), {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Cache": cacheHit ? "HIT" : "MISS",
+          "X-Cache-Key": cacheKey,
+          "X-Response-Time": `${duration}ms`
+        }
+      });
+    } catch (error) {
+      console.error("Worker error:", (error as Error).message);
+      return new Response(JSON.stringify({
+        error: "Search request failed",
+        message: (error as Error).message
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json"
+        }
+      });
+    }
+  }
+};{% endverbatim %}</textarea>
+                </div>
+            </li>
+            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Deploy</strong></li>
+        </ol>
+
+        <h4>{{ 'Step 3: Configure Worker Settings'|t('algolia-accelerator') }}</h4>
+        <p style="margin: 8px 0; font-size: 13px; color: #666;">
+            {{ 'Get your Algolia credentials from'|t('algolia-accelerator') }} <a href="https://dashboard.algolia.com/account/api-keys" target="_blank">{{ 'Algolia Dashboard → API Keys'|t('algolia-accelerator') }}</a>
+        </p>
+        <ol style="margin: 8px 0 16px 20px;">
+            <li>{{ 'In your Worker, go to'|t('algolia-accelerator') }} <strong>Settings → Variables</strong></li>
+            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Environment Variables</strong>, {{ 'add:'|t('algolia-accelerator') }}
+                <ul style="margin: 8px 0 8px 20px;">
+                    <li><code>ALGOLIA_HOST</code> = <code>[Your-Algolia-App-ID]-dsn.algolia.net</code> <span style="color: #666;">({{ 'e.g.'|t('algolia-accelerator') }} <code>ABC123XYZ-dsn.algolia.net</code>)</span></li>
+                    <li><code>ALGOLIA_APP_ID</code> = {{ 'Your Algolia Application ID'|t('algolia-accelerator') }} <span style="color: #666;">({{ 'e.g.'|t('algolia-accelerator') }} <code>ABC123XYZ</code>)</span></li>
+                    <li><code>CACHE_TTL_SECONDS</code> = <code>86400</code> <span style="color: #666;">(24 {{ 'hours'|t('algolia-accelerator') }})</span></li>
+                </ul>
+            </li>
+            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Secrets</strong>, {{ 'add:'|t('algolia-accelerator') }}
+                <ul style="margin: 8px 0 8px 20px;">
+                    <li><code>ALGOLIA_API_KEY</code> = {{ 'Your Algolia Search-Only API Key'|t('algolia-accelerator') }} <span style="color: #666;">({{ 'not the Admin key!'|t('algolia-accelerator') }})</span></li>
+                    <li><code>PURGE_TOKEN</code> = {{ 'A secure random string you create'|t('algolia-accelerator') }} <span style="color: #c00; font-weight: 600;">({{ 'save this - you need it below!'|t('algolia-accelerator') }})</span></li>
+                </ul>
+            </li>
+            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>KV Namespace Bindings</strong>, {{ 'add:'|t('algolia-accelerator') }}
+                <ul style="margin: 8px 0 8px 20px;">
+                    <li>{{ 'Variable name:'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code></li>
+                    <li>{{ 'KV namespace:'|t('algolia-accelerator') }} {{ 'Select'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ '(the namespace you created in Step 1)'|t('algolia-accelerator') }}</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h4>{{ 'Step 4: Add a Custom Domain (Recommended)'|t('algolia-accelerator') }}</h4>
+        <ol style="margin: 8px 0 16px 20px;">
+            <li>{{ 'In your Worker, go to'|t('algolia-accelerator') }} <strong>Settings → Triggers</strong></li>
+            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Custom Domains</strong>, {{ 'click'|t('algolia-accelerator') }} <strong>Add Custom Domain</strong></li>
+            <li>{{ 'Enter a subdomain like'|t('algolia-accelerator') }} <code>search-api.yourdomain.com</code></li>
+            <li>{{ 'This subdomain becomes your'|t('algolia-accelerator') }} <strong>Worker Host</strong> {{ 'below'|t('algolia-accelerator') }}</li>
+        </ol>
+
+        <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; margin-top: 16px;">
+            <strong>{{ "You're done!"|t('algolia-accelerator') }}</strong> {{ 'Now enter your values below:'|t('algolia-accelerator') }}
+            <ul style="margin: 8px 0 0 20px;">
+                <li><strong>Worker Host</strong> = {{ 'Your custom domain or'|t('algolia-accelerator') }} <code>algolia-cache-worker.YOUR-SUBDOMAIN.workers.dev</code></li>
+                <li><strong>Purge Token</strong> = {{ 'The secret you created in Step 3'|t('algolia-accelerator') }}</li>
+            </ul>
+        </div>
+    </div>
+</details>
+
+
+{{ forms.textField({
+    label: 'Worker Host'|t('algolia-accelerator'),
+    instructions: 'The hostname of your Cloudflare Worker. This is the <code>*.workers.dev</code> URL or custom domain from Cloudflare.'|t('algolia-accelerator')|raw,
+    id: 'workerHost',
+    name: 'workerHost',
+    value: settings.workerHost,
+    placeholder: '$ALGOLIA_CACHE_WORKER_HOST',
+    required: true,
+}) }}
+
+{{ forms.passwordField({
+    label: 'Purge Token'|t('algolia-accelerator'),
+    instructions: 'The secure token you created and added as a Secret in your Cloudflare Worker settings (Settings → Variables → Secrets → PURGE_TOKEN).'|t('algolia-accelerator'),
+    id: 'purgeToken',
+    name: 'purgeToken',
+    value: settings.purgeToken,
+    placeholder: '$ALGOLIA_CACHE_PURGE_TOKEN',
+    required: true,
+}) }}
+
+<hr>
+
+<h2>{{ 'Cache Triggers'|t('algolia-accelerator') }}</h2>
+
+{{ forms.checkboxSelectField({
+    label: 'Trigger Sections'|t('algolia-accelerator'),
+    instructions: 'Select which sections should trigger a cache purge when entries are saved.'|t('algolia-accelerator'),
+    id: 'triggerSections',
+    name: 'triggerSections',
+    options: sectionOptions,
+    values: settings.triggerSections,
+}) }}
+
+<hr>
+
+<h2>{{ 'Cache Settings'|t('algolia-accelerator') }}</h2>
+
+{{ forms.textField({
+    label: 'Cache TTL (seconds)'|t('algolia-accelerator'),
+    instructions: 'Informational only - the actual TTL is configured in the Cloudflare Worker. Default: 86400 (24 hours)'|t('algolia-accelerator'),
+    id: 'cacheTtl',
+    name: 'cacheTtl',
+    value: settings.cacheTtl,
+    type: 'number',
+    min: 60,
+    disabled: true,
+}) }}
+
+<hr>
+
+<h2>{{ 'Frontend Integration'|t('algolia-accelerator') }}</h2>
+
+<div class="readable">
+    <p>{{ 'To use the cache, your frontend must send search requests to the Cloudflare Worker instead of directly to Algolia. The worker URL follows the same API structure as Algolia, so you only need to change the host.'|t('algolia-accelerator') }}</p>
+
+    <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
+        <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
+            {{ 'InstantSearch.js / Vue InstantSearch / React InstantSearch'|t('algolia-accelerator') }}
+        </summary>
+        <div style="padding: 16px;">
+            <p style="margin-top: 0;">{{ 'Create a custom search client that routes requests through your worker:'|t('algolia-accelerator') }}</p>
+            <textarea readonly style="width: 100%; height: 220px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">// Replace 'search-api.yourdomain.com' with your Worker Host
+const WORKER_HOST = 'https://search-api.yourdomain.com';
+
+const searchClient = {
+  search(requests) {
+    return fetch(`${WORKER_HOST}/1/indexes/*/queries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requests }),
+    }).then(res => res.json());
+  },
+  searchForFacetValues(requests) {
+    // Optional: implement if you use facet search
+    return Promise.resolve({ facetHits: [] });
+  },
+};
+
+// Use with InstantSearch
+const search = instantsearch({
+  indexName: 'your_index_name',
+  searchClient,
+});</textarea>
+        </div>
+    </details>
+
+    <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
+        <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
+            {{ 'Autocomplete.js'|t('algolia-accelerator') }}
+        </summary>
+        <div style="padding: 16px;">
+            <p style="margin-top: 0;">{{ 'For Algolia Autocomplete, create a custom requester:'|t('algolia-accelerator') }}</p>
+            <textarea readonly style="width: 100%; height: 280px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js';
+
+const WORKER_HOST = 'https://search-api.yourdomain.com';
+
+// Custom search client for autocomplete
+const searchClient = {
+  search(requests) {
+    return fetch(`${WORKER_HOST}/1/indexes/*/queries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requests }),
+    }).then(res => res.json());
+  },
+};
+
+autocomplete({
+  container: '#autocomplete',
+  getSources({ query }) {
+    return [{
+      sourceId: 'products',
+      getItems() {
+        return getAlgoliaResults({
+          searchClient,
+          queries: [{ indexName: 'your_index', query }],
+        });
+      },
+      // ... templates
+    }];
+  },
+});</textarea>
+        </div>
+    </details>
+
+    <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
+        <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
+            {{ 'Direct API Calls (fetch/axios)'|t('algolia-accelerator') }}
+        </summary>
+        <div style="padding: 16px;">
+            <p style="margin-top: 0;">{{ 'If you make direct API calls, simply change the endpoint:'|t('algolia-accelerator') }}</p>
+            <textarea readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">// Before (direct to Algolia):
+// const url = 'https://ABC123-dsn.algolia.net/1/indexes/*/queries';
+
+// After (through cache worker):
+const WORKER_HOST = 'https://search-api.yourdomain.com';
+
+const response = await fetch(`${WORKER_HOST}/1/indexes/*/queries`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    requests: [{ indexName: 'your_index', query: 'search term' }]
+  }),
+});
+
+const data = await response.json();
+// Check cache status via response headers:
+// response.headers.get('X-Cache')  // 'HIT' or 'MISS'</textarea>
+        </div>
+    </details>
+
+    <div style="background: #e3f2fd; padding: 12px 16px; border-radius: 4px; margin-top: 16px;">
+        <p style="margin: 0;"><strong>{{ 'Key Point:'|t('algolia-accelerator') }}</strong> {{ 'The Cloudflare Worker acts as a transparent proxy. Your frontend code stays almost identical - you only change the host URL. The worker handles authentication with Algolia automatically using the credentials you configured.'|t('algolia-accelerator') }}</p>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <h4 style="margin-bottom: 8px;">{{ 'Verifying Cache Performance'|t('algolia-accelerator') }}</h4>
+        <p style="margin: 0;">{{ 'Check the response headers in your browser DevTools (Network tab) to verify caching is working:'|t('algolia-accelerator') }}</p>
+        <ul style="margin: 8px 0 0 20px;">
+            <li><code>X-Cache: HIT</code> = {{ 'Response served from cache (fast, 2-10ms)'|t('algolia-accelerator') }}</li>
+            <li><code>X-Cache: MISS</code> = {{ 'Fresh response from Algolia (slower, 300-500ms)'|t('algolia-accelerator') }}</li>
+            <li><code>X-Response-Time</code> = {{ 'Actual request duration'|t('algolia-accelerator') }}</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<div class="readable">
+    <blockquote class="note tip">
+        <p><strong>{{ 'Tip:'|t('algolia-accelerator') }}</strong> {{ 'Use the'|t('algolia-accelerator') }} <a href="{{ cpUrl('utilities/algolia-accelerator') }}">{{ 'Algolia Accelerator utility'|t('algolia-accelerator') }}</a> {{ 'to manually purge the cache and check worker status.'|t('algolia-accelerator') }}</p>
+    </blockquote>
+</div>
+
+<script>
+(function() {
+    // Click to select all code
+    var codeArea = document.getElementById('worker-code');
+
+    if (codeArea) {
+        codeArea.onclick = function() {
+            this.select();
+            this.setSelectionRange(0, this.value.length);
+        };
+
+        codeArea.onfocus = function() {
+            this.select();
+            this.setSelectionRange(0, this.value.length);
+        };
+    }
+})();
+</script>

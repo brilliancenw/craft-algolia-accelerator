@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Cloudflare Worker
+cloudflare-worker/wrangler.toml
+cloudflare-worker/.wrangler/
+cloudflare-worker/dist/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.cache

@@ -1,0 +1,51 @@
+{
+  "name": "brilliancenw/craft-algolia-accelerator",
+  "description": "Cloudflare-powered caching layer for Algolia search with automatic cache purging. Reduces search response times from 300-500ms to 2-10ms.",
+  "version": "1.0.0",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "algolia",
+    "search",
+    "cache",
+    "cloudflare",
+    "performance",
+    "workers",
+    "kv"
+  ],
+  "authors": [
+    {
+      "name": "Brilliance",
+      "homepage": "https://www.brilliancenw.com"
+    }
+  ],
+  "support": {
+    "email": "support@brilliancenw.com",
+    "docs": "https://github.com/brilliancenw/craft-algolia-accelerator#readme",
+    "issues": "https://github.com/brilliancenw/craft-algolia-accelerator/issues"
+  },
+  "require": {
+    "php": "^8.2",
+    "craftcms/cms": "^5.0.0",
+    "guzzlehttp/guzzle": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "brilliance\\algoliaaccelerator\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Algolia Accelerator",
+    "handle": "algolia-accelerator",
+    "hasCpSettings": true,
+    "hasCpSection": false,
+    "class": "brilliance\\algoliaaccelerator\\AlgoliaAccelerator",
+    "developer": "Brilliance",
+    "developerUrl": "https://www.brilliancenw.com",
+    "documentationUrl": "https://github.com/brilliancenw/craft-algolia-accelerator#readme",
+    "changelogUrl": "https://raw.githubusercontent.com/brilliancenw/craft-algolia-accelerator/main/CHANGELOG.md"
+  }
+}

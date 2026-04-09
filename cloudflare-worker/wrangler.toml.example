@@ -1,0 +1,97 @@
+# Algolia Cache Worker Configuration
+#
+# Copy this file to wrangler.toml and fill in your values:
+#   cp wrangler.toml.example wrangler.toml
+#
+# Then set your secrets:
+#   wrangler secret put ALGOLIA_API_KEY
+#   wrangler secret put PURGE_TOKEN
+
+name = "algolia-cache-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# ============================================================================
+# Local Development
+# ============================================================================
+# These values are used when running `wrangler dev` locally
+
+[vars]
+# Your Algolia host (format: YOUR-APP-ID-dsn.algolia.net)
+ALGOLIA_HOST = "YOUR-APP-ID-dsn.algolia.net"
+# Your Algolia Application ID
+ALGOLIA_APP_ID = "YOUR-APP-ID"
+# Environment identifier (for logging)
+ENVIRONMENT = "development"
+# Cache TTL in seconds (default: 86400 = 24 hours)
+CACHE_TTL_SECONDS = "86400"
+
+[[kv_namespaces]]
+binding = "SEARCH_CACHE"
+# Replace with your preview KV namespace ID for local development
+id = "REPLACE_WITH_PREVIEW_KV_ID"
+preview_id = "REPLACE_WITH_PREVIEW_KV_ID"
+
+# ============================================================================
+# Development Environment
+# ============================================================================
+# Deploy with: npm run deploy:dev
+
+[env.development]
+name = "algolia-cache-worker-dev"
+
+[env.development.vars]
+ALGOLIA_HOST = "YOUR-APP-ID-dsn.algolia.net"
+ALGOLIA_APP_ID = "YOUR-APP-ID"
+ENVIRONMENT = "development"
+CACHE_TTL_SECONDS = "3600"  # 1 hour for faster iteration
+
+[[env.development.kv_namespaces]]
+binding = "SEARCH_CACHE"
+id = "REPLACE_WITH_DEV_KV_ID"
+
+# ============================================================================
+# Staging Environment
+# ============================================================================
+# Deploy with: npm run deploy:staging
+
+[env.staging]
+name = "algolia-cache-worker-staging"
+
+[env.staging.vars]
+ALGOLIA_HOST = "YOUR-APP-ID-dsn.algolia.net"
+ALGOLIA_APP_ID = "YOUR-APP-ID"
+ENVIRONMENT = "staging"
+CACHE_TTL_SECONDS = "86400"
+
+[[env.staging.kv_namespaces]]
+binding = "SEARCH_CACHE"
+id = "REPLACE_WITH_STAGING_KV_ID"
+
+# ============================================================================
+# Production Environment
+# ============================================================================
+# Deploy with: npm run deploy:production
+
+[env.production]
+name = "algolia-cache-worker-prod"
+
+[env.production.vars]
+ALGOLIA_HOST = "YOUR-APP-ID-dsn.algolia.net"
+ALGOLIA_APP_ID = "YOUR-APP-ID"
+ENVIRONMENT = "production"
+CACHE_TTL_SECONDS = "86400"
+
+[[env.production.kv_namespaces]]
+binding = "SEARCH_CACHE"
+id = "REPLACE_WITH_PROD_KV_ID"
+
+# ============================================================================
+# Routes (Optional)
+# ============================================================================
+# Uncomment and configure if using route-based deployment instead of
+# a custom domain. Custom domains are configured in the Cloudflare dashboard.
+#
+# [env.production.routes]
+# route = "search-api.yourdomain.com/*"
+# zone_name = "yourdomain.com"
