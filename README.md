@@ -12,14 +12,16 @@ Algolia Accelerator consists of two components:
 2. **Craft CMS Plugin** - Automatically purges the cache when content is saved in configured sections
 
 ```
+                        SEARCH FLOW
 ┌─────────────┐    ┌───────────────────┐    ┌─────────────┐
-│   Browser   │───▶│  Cloudflare KV    │───▶│   Algolia   │
-│  (Frontend) │    │  Cache Worker     │    │     API     │
+│   Browser   │───▶│    Cloudflare     │───▶│   Algolia   │
+│  (Frontend) │◀───│  Worker + Cache   │◀───│     API     │
 └─────────────┘    └───────────────────┘    └─────────────┘
-                           │
-                   ┌───────▼───────┐
+                           ▲
+                           │ cache purge
+                   ┌───────┴───────┐
                    │   Craft CMS   │
-                   │ (Cache Purge) │
+                   │  (on save)    │
                    └───────────────┘
 ```
 
