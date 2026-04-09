@@ -1,5 +1,5 @@
 {
-  "name": "brilliancenw/craft-algolia-accelerator",
+  "name": "brilliance/craft-algolia-accelerator",
   "description": "Cloudflare-powered caching layer for Algolia search with automatic cache purging. Reduces search response times from 300-500ms to 2-10ms.",
   "version": "1.0.0",
   "type": "craft-plugin",
