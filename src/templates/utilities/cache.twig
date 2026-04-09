@@ -8,33 +8,33 @@
     {% if not isConfigured %}
     <div class="readable" style="margin-bottom: 24px;">
         <blockquote class="note warning">
-            <p><strong>{{ 'Setup Required'|t('algolia-accelerator') }}</strong></p>
-            <p>{{ "Your domain's DNS must be routed through Cloudflare, and a Cloudflare Worker must be deployed."|t('algolia-accelerator') }}</p>
-            <p style="margin-top: 12px;">{{ 'The plugin settings page includes step-by-step instructions for setting up the Worker through the Cloudflare Dashboard (no CLI required).'|t('algolia-accelerator') }}</p>
+            <p><strong>{{ 'Setup Required'|t('craft-algolia-accelerator') }}</strong></p>
+            <p>{{ "Your domain's DNS must be routed through Cloudflare, and a Cloudflare Worker must be deployed."|t('craft-algolia-accelerator') }}</p>
+            <p style="margin-top: 12px;">{{ 'The plugin settings page includes step-by-step instructions for setting up the Worker through the Cloudflare Dashboard (no CLI required).'|t('craft-algolia-accelerator') }}</p>
             <p style="margin-top: 12px;">
-                <a href="{{ cpUrl('settings/plugins/algolia-accelerator') }}" class="btn submit">{{ 'Open Settings & Setup Guide'|t('algolia-accelerator') }}</a>
+                <a href="{{ cpUrl('settings/plugins/craft-algolia-accelerator') }}" class="btn submit">{{ 'Open Settings & Setup Guide'|t('craft-algolia-accelerator') }}</a>
             </p>
         </blockquote>
     </div>
     {% endif %}
 
     {# Status Section #}
-    <h2>{{ 'Status'|t('algolia-accelerator') }}</h2>
+    <h2>{{ 'Status'|t('craft-algolia-accelerator') }}</h2>
 
     {# Configuration Status #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Configuration'|t('algolia-accelerator') }}</label>
+            <label>{{ 'Configuration'|t('craft-algolia-accelerator') }}</label>
         </div>
         <div class="input">
             {% if isConfigured %}
                 <span class="status green"></span>
-                <span>{{ 'Configured'|t('algolia-accelerator') }}</span>
-                <span class="light"> - <a href="{{ cpUrl('settings/plugins/algolia-accelerator') }}">{{ 'Edit settings'|t('algolia-accelerator') }}</a></span>
+                <span>{{ 'Configured'|t('craft-algolia-accelerator') }}</span>
+                <span class="light"> - <a href="{{ cpUrl('settings/plugins/craft-algolia-accelerator') }}">{{ 'Edit settings'|t('craft-algolia-accelerator') }}</a></span>
             {% else %}
                 <span class="status red"></span>
-                <span>{{ 'Not configured'|t('algolia-accelerator') }}</span>
-                <span class="light"> - <a href="{{ cpUrl('settings/plugins/algolia-accelerator') }}">{{ 'Configure worker host and purge token'|t('algolia-accelerator') }}</a></span>
+                <span>{{ 'Not configured'|t('craft-algolia-accelerator') }}</span>
+                <span class="light"> - <a href="{{ cpUrl('settings/plugins/craft-algolia-accelerator') }}">{{ 'Configure worker host and purge token'|t('craft-algolia-accelerator') }}</a></span>
             {% endif %}
         </div>
     </div>
@@ -42,20 +42,20 @@
     {# Worker Status #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Worker Status'|t('algolia-accelerator') }}</label>
+            <label>{{ 'Worker Status'|t('craft-algolia-accelerator') }}</label>
         </div>
         <div class="input">
             {% if workerStatus.online %}
                 <span class="status green"></span>
-                <span>{{ 'Online'|t('algolia-accelerator') }}</span>
+                <span>{{ 'Online'|t('craft-algolia-accelerator') }}</span>
                 {% if workerStatus.data.environment is defined %}
                     <span class="light"> ({{ workerStatus.data.environment }})</span>
                 {% endif %}
             {% else %}
                 <span class="status red"></span>
-                <span>{{ 'Offline'|t('algolia-accelerator') }}</span>
+                <span>{{ 'Offline'|t('craft-algolia-accelerator') }}</span>
                 {% if not isConfigured %}
-                    <span class="light"> - {{ 'Configure settings first'|t('algolia-accelerator') }}</span>
+                    <span class="light"> - {{ 'Configure settings first'|t('craft-algolia-accelerator') }}</span>
                 {% else %}
                     <span class="light"> - {{ workerStatus.message }}</span>
                 {% endif %}
@@ -66,13 +66,13 @@
     {# Trigger Sections #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Trigger Sections'|t('algolia-accelerator') }}</label>
+            <label>{{ 'Trigger Sections'|t('craft-algolia-accelerator') }}</label>
         </div>
         <div class="input">
             {% if triggerSectionNames|length %}
                 {{ triggerSectionNames|join(', ') }}
             {% else %}
-                <span class="light">{{ 'No sections configured'|t('algolia-accelerator') }} - <a href="{{ cpUrl('settings/plugins/algolia-accelerator') }}">{{ 'Edit settings'|t('algolia-accelerator') }}</a></span>
+                <span class="light">{{ 'No sections configured'|t('craft-algolia-accelerator') }} - <a href="{{ cpUrl('settings/plugins/craft-algolia-accelerator') }}">{{ 'Edit settings'|t('craft-algolia-accelerator') }}</a></span>
             {% endif %}
         </div>
     </div>
@@ -80,12 +80,12 @@
     <hr>
 
     {# Enable/Disable Toggle - only show when ready #}
-    <h2>{{ 'Cache Purging'|t('algolia-accelerator') }}</h2>
+    <h2>{{ 'Cache Purging'|t('craft-algolia-accelerator') }}</h2>
 
     {% if isReady %}
         {{ forms.lightswitchField({
-            label: 'Auto-Purge on Entry Save'|t('algolia-accelerator'),
-            instructions: 'When enabled, the cache will automatically purge when entries in the configured sections are saved. When disabled, cache will only expire based on TTL.'|t('algolia-accelerator'),
+            label: 'Auto-Purge on Entry Save'|t('craft-algolia-accelerator'),
+            instructions: 'When enabled, the cache will automatically purge when entries in the configured sections are saved. When disabled, cache will only expire based on TTL.'|t('craft-algolia-accelerator'),
             id: 'accelerator-toggle',
             name: 'enabled',
             on: settings.enabled,
@@ -93,14 +93,14 @@
     {% else %}
         <div class="field">
             <div class="heading">
-                <label>{{ 'Auto-Purge on Entry Save'|t('algolia-accelerator') }}</label>
+                <label>{{ 'Auto-Purge on Entry Save'|t('craft-algolia-accelerator') }}</label>
             </div>
             <div class="input">
                 <span class="light">
                     {% if not isConfigured %}
-                        {{ 'Configure settings before enabling.'|t('algolia-accelerator') }}
+                        {{ 'Configure settings before enabling.'|t('craft-algolia-accelerator') }}
                     {% elseif not workerStatus.online %}
-                        {{ 'Worker must be online before enabling.'|t('algolia-accelerator') }}
+                        {{ 'Worker must be online before enabling.'|t('craft-algolia-accelerator') }}
                     {% endif %}
                 </span>
             </div>
@@ -110,13 +110,13 @@
     {# Last Purge #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Last Purge (this session)'|t('algolia-accelerator') }}</label>
+            <label>{{ 'Last Purge (this session)'|t('craft-algolia-accelerator') }}</label>
         </div>
         <div class="input" id="lastPurgeTime">
             {% if lastPurgeTime %}
                 {{ lastPurgeTime }}
             {% else %}
-                <span class="light">{{ 'Not purged yet'|t('algolia-accelerator') }}</span>
+                <span class="light">{{ 'Not purged yet'|t('craft-algolia-accelerator') }}</span>
             {% endif %}
         </div>
     </div>
@@ -124,14 +124,14 @@
     {# Manual Purge Button #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Manual Purge'|t('algolia-accelerator') }}</label>
+            <label>{{ 'Manual Purge'|t('craft-algolia-accelerator') }}</label>
             <div class="instructions">
-                <p>{{ 'Immediately purge all cached search results. This will cause the next search requests to fetch fresh data from Algolia.'|t('algolia-accelerator') }}</p>
+                <p>{{ 'Immediately purge all cached search results. This will cause the next search requests to fetch fresh data from Algolia.'|t('craft-algolia-accelerator') }}</p>
             </div>
         </div>
         <div class="input">
             <button type="button" id="purge-cache-btn" class="btn {% if not isReady %}disabled{% endif %}" {% if not isReady %}disabled{% endif %}>
-                {{ 'Purge Cache'|t('algolia-accelerator') }}
+                {{ 'Purge Cache'|t('craft-algolia-accelerator') }}
             </button>
             <span id="purge-status" class="light" style="margin-left: 10px;"></span>
         </div>
@@ -141,7 +141,7 @@
     <div class="field">
         <div class="input">
             <button type="button" id="refresh-status-btn" class="btn secondary">
-                {{ 'Refresh Status'|t('algolia-accelerator') }}
+                {{ 'Refresh Status'|t('craft-algolia-accelerator') }}
             </button>
         </div>
     </div>
@@ -149,58 +149,58 @@
     <hr>
 
     {# Troubleshooting Section #}
-    <h2>{{ 'Troubleshooting'|t('algolia-accelerator') }}</h2>
+    <h2>{{ 'Troubleshooting'|t('craft-algolia-accelerator') }}</h2>
 
     <div class="readable">
-        <h4 style="margin-top: 0;">{{ 'Checking Cache Status (HIT vs MISS)'|t('algolia-accelerator') }}</h4>
-        <p>{{ 'The Cloudflare Worker adds response headers to every search request that tell you whether the response came from cache:'|t('algolia-accelerator') }}</p>
+        <h4 style="margin-top: 0;">{{ 'Checking Cache Status (HIT vs MISS)'|t('craft-algolia-accelerator') }}</h4>
+        <p>{{ 'The Cloudflare Worker adds response headers to every search request that tell you whether the response came from cache:'|t('craft-algolia-accelerator') }}</p>
 
         <table class="data" style="margin: 16px 0;">
             <thead>
                 <tr>
-                    <th>{{ 'Header'|t('algolia-accelerator') }}</th>
-                    <th>{{ 'Description'|t('algolia-accelerator') }}</th>
+                    <th>{{ 'Header'|t('craft-algolia-accelerator') }}</th>
+                    <th>{{ 'Description'|t('craft-algolia-accelerator') }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><code>X-Cache: HIT</code></td>
-                    <td>{{ 'Response was served from cache (fast, typically 2-10ms)'|t('algolia-accelerator') }}</td>
+                    <td>{{ 'Response was served from cache (fast, typically 2-10ms)'|t('craft-algolia-accelerator') }}</td>
                 </tr>
                 <tr>
                     <td><code>X-Cache: MISS</code></td>
-                    <td>{{ 'Response was fetched from Algolia and then cached (slower, typically 300-500ms)'|t('algolia-accelerator') }}</td>
+                    <td>{{ 'Response was fetched from Algolia and then cached (slower, typically 300-500ms)'|t('craft-algolia-accelerator') }}</td>
                 </tr>
                 <tr>
                     <td><code>X-Response-Time</code></td>
-                    <td>{{ 'How long the request took (e.g., "5ms" or "350ms")'|t('algolia-accelerator') }}</td>
+                    <td>{{ 'How long the request took (e.g., "5ms" or "350ms")'|t('craft-algolia-accelerator') }}</td>
                 </tr>
                 <tr>
                     <td><code>X-Cache-Key</code></td>
-                    <td>{{ 'The unique cache key for this request (useful for debugging)'|t('algolia-accelerator') }}</td>
+                    <td>{{ 'The unique cache key for this request (useful for debugging)'|t('craft-algolia-accelerator') }}</td>
                 </tr>
             </tbody>
         </table>
 
-        <h4>{{ 'How to View Response Headers'|t('algolia-accelerator') }}</h4>
+        <h4>{{ 'How to View Response Headers'|t('craft-algolia-accelerator') }}</h4>
         <ol>
-            <li>{{ 'Open your browser Developer Tools (F12 or right-click → Inspect)'|t('algolia-accelerator') }}</li>
-            <li>{{ 'Go to the <strong>Network</strong> tab'|t('algolia-accelerator')|raw }}</li>
-            <li>{{ 'Perform a search on your site'|t('algolia-accelerator') }}</li>
-            <li>{{ 'Look for requests to your worker domain (e.g., search-api.yourdomain.com)'|t('algolia-accelerator') }}</li>
-            <li>{{ 'Click the request and view the <strong>Response Headers</strong> section'|t('algolia-accelerator')|raw }}</li>
+            <li>{{ 'Open your browser Developer Tools (F12 or right-click → Inspect)'|t('craft-algolia-accelerator') }}</li>
+            <li>{{ 'Go to the <strong>Network</strong> tab'|t('craft-algolia-accelerator')|raw }}</li>
+            <li>{{ 'Perform a search on your site'|t('craft-algolia-accelerator') }}</li>
+            <li>{{ 'Look for requests to your worker domain (e.g., search-api.yourdomain.com)'|t('craft-algolia-accelerator') }}</li>
+            <li>{{ 'Click the request and view the <strong>Response Headers</strong> section'|t('craft-algolia-accelerator')|raw }}</li>
         </ol>
 
-        <h4>{{ 'Common Issues'|t('algolia-accelerator') }}</h4>
+        <h4>{{ 'Common Issues'|t('craft-algolia-accelerator') }}</h4>
         <dl>
-            <dt><strong>{{ 'Always seeing MISS'|t('algolia-accelerator') }}</strong></dt>
-            <dd>{{ 'Each unique search query creates a separate cache entry. Identical searches should show HIT on the second request. If not, check that your KV namespace is properly bound in Cloudflare Worker settings.'|t('algolia-accelerator') }}</dd>
+            <dt><strong>{{ 'Always seeing MISS'|t('craft-algolia-accelerator') }}</strong></dt>
+            <dd>{{ 'Each unique search query creates a separate cache entry. Identical searches should show HIT on the second request. If not, check that your KV namespace is properly bound in Cloudflare Worker settings.'|t('craft-algolia-accelerator') }}</dd>
 
-            <dt style="margin-top: 12px;"><strong>{{ 'Cache not purging when content is saved'|t('algolia-accelerator') }}</strong></dt>
-            <dd>{{ "Check that the entry's section is selected in Trigger Sections (plugin settings), and verify the Worker Host and Purge Token are correct."|t('algolia-accelerator') }}</dd>
+            <dt style="margin-top: 12px;"><strong>{{ 'Cache not purging when content is saved'|t('craft-algolia-accelerator') }}</strong></dt>
+            <dd>{{ "Check that the entry's section is selected in Trigger Sections (plugin settings), and verify the Worker Host and Purge Token are correct."|t('craft-algolia-accelerator') }}</dd>
 
-            <dt style="margin-top: 12px;"><strong>{{ 'Worker status showing Offline'|t('algolia-accelerator') }}</strong></dt>
-            <dd>{{ 'Verify your Worker is deployed in Cloudflare and the Worker Host URL is correct. Try visiting'|t('algolia-accelerator') }} <code>https://[your-worker-host]/health</code> {{ 'directly in your browser.'|t('algolia-accelerator') }}</dd>
+            <dt style="margin-top: 12px;"><strong>{{ 'Worker status showing Offline'|t('craft-algolia-accelerator') }}</strong></dt>
+            <dd>{{ 'Verify your Worker is deployed in Cloudflare and the Worker Host URL is correct. Try visiting'|t('craft-algolia-accelerator') }} <code>https://[your-worker-host]/health</code> {{ 'directly in your browser.'|t('craft-algolia-accelerator') }}</dd>
         </dl>
     </div>
 </div>

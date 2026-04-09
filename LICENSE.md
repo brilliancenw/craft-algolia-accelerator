@@ -2,11 +2,11 @@ Copyright (c) Brilliance
 
 ## Craft License
 
-This license applies to the Craft CMS plugin "Algolia Accelerator" and all accompanying files.
+This license applies to the Craft CMS plugin "Craft Algolia Accelerator" and all accompanying files.
 
 ### 1. Grant of License
 
-Subject to the terms of this license, you are granted a limited, non-exclusive, non-transferable license to install and use Algolia Accelerator (the "Software") on one Craft CMS installation, subject to the following conditions:
+Subject to the terms of this license, you are granted a limited, non-exclusive, non-transferable license to install and use Craft Algolia Accelerator (the "Software") on one Craft CMS installation, subject to the following conditions:
 
 ### 2. Permitted Uses
 

@@ -1,4 +1,4 @@
-# Algolia Accelerator
+# Craft Algolia Accelerator
 
 A Cloudflare-powered caching layer for Algolia search that dramatically improves performance.
 
@@ -38,7 +38,7 @@ Algolia Accelerator consists of two components:
 
 **From the Plugin Store (recommended):**
 
-Search for "Algolia Accelerator" in the Craft Plugin Store, or visit:
+Search for "Craft Algolia Accelerator" in the Craft Plugin Store, or visit:
 https://plugins.craftcms.com/algolia-accelerator
 
 **Via Composer:**
@@ -52,7 +52,7 @@ php craft plugin/install algolia-accelerator
 
 The plugin settings page includes a complete step-by-step guide for deploying the Cloudflare Worker through the Cloudflare Dashboard (no CLI required).
 
-1. Go to **Settings** > **Plugins** > **Algolia Accelerator**
+1. Go to **Settings** > **Plugins** > **Craft Algolia Accelerator**
 2. Follow the "Step-by-Step Cloudflare Setup" guide
 
 ### Step 3: Configure the Plugin

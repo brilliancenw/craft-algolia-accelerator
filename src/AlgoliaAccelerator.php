@@ -15,7 +15,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\services\Utilities;
 
 /**
- * Algolia Accelerator Plugin
+ * Craft Algolia Accelerator Plugin
  *
  * Provides automatic cache purging for a Cloudflare-based Algolia caching layer.
  *
@@ -46,7 +46,7 @@ class AlgoliaAccelerator extends Plugin
             $this->attachEventHandlers();
         });
 
-        Craft::info('Algolia Accelerator plugin loaded', __METHOD__);
+        Craft::info('Craft Algolia Accelerator plugin loaded', __METHOD__);
     }
 
     protected function createSettingsModel(): ?Model
@@ -66,7 +66,7 @@ class AlgoliaAccelerator extends Plugin
             ];
         }
 
-        return Craft::$app->view->renderTemplate('algolia-accelerator/settings', [
+        return Craft::$app->view->renderTemplate('craft-algolia-accelerator/settings', [
             'plugin' => $this,
             'settings' => $this->getSettings(),
             'sectionOptions' => $sectionOptions,
@@ -106,7 +106,7 @@ class AlgoliaAccelerator extends Plugin
 
                 // Check if this section should trigger a purge
                 if (!empty($settings->triggerSections) && in_array($sectionHandle, $settings->triggerSections, true)) {
-                    Craft::info("Algolia Accelerator: Entry saved in section '{$sectionHandle}', triggering cache purge", __METHOD__);
+                    Craft::info("Craft Algolia Accelerator: Entry saved in section '{$sectionHandle}', triggering cache purge", __METHOD__);
                     $this->cachePurge->purgeCache($sectionHandle);
                 }
             }

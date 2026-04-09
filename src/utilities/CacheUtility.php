@@ -15,12 +15,12 @@ class CacheUtility extends Utility
 {
     public static function displayName(): string
     {
-        return Craft::t('algolia-accelerator', 'Algolia Accelerator');
+        return Craft::t('craft-algolia-accelerator', 'Algolia Accelerator');
     }
 
     public static function id(): string
     {
-        return 'algolia-accelerator';
+        return 'craft-algolia-accelerator';
     }
 
     public static function icon(): ?string
@@ -49,7 +49,7 @@ class CacheUtility extends Utility
             }
         }
 
-        return Craft::$app->getView()->renderTemplate('algolia-accelerator/utilities/cache', [
+        return Craft::$app->getView()->renderTemplate('craft-algolia-accelerator/utilities/cache', [
             'settings' => $settings,
             'workerStatus' => $workerStatus,
             'isConfigured' => $cachePurgeService->isConfigured(),

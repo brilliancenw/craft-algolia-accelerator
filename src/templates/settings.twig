@@ -1,16 +1,16 @@
 {% import '_includes/forms.twig' as forms %}
 
 <div class="readable" style="margin-bottom: 24px;">
-    <p>{{ 'Algolia Accelerator dramatically improves search performance by caching Algolia responses at the edge using Cloudflare Workers.'|t('algolia-accelerator') }}</p>
-    <p style="margin-bottom: 0;"><strong>{{ 'How it works:'|t('algolia-accelerator') }}</strong> {{ 'A Cloudflare Worker sits between your frontend and Algolia, caching search responses in Cloudflare KV storage. When content changes in Craft, this plugin automatically purges the cache so users always see fresh results.'|t('algolia-accelerator') }}</p>
-    <p style="margin-top: 8px; color: #666;"><strong>{{ 'Performance:'|t('algolia-accelerator') }}</strong> {{ 'Typical Algolia requests (300-500ms) are reduced to 2-10ms for cached responses.'|t('algolia-accelerator') }}</p>
+    <p>{{ 'Algolia Accelerator dramatically improves search performance by caching Algolia responses at the edge using Cloudflare Workers.'|t('craft-algolia-accelerator') }}</p>
+    <p style="margin-bottom: 0;"><strong>{{ 'How it works:'|t('craft-algolia-accelerator') }}</strong> {{ 'A Cloudflare Worker sits between your frontend and Algolia, caching search responses in Cloudflare KV storage. When content changes in Craft, this plugin automatically purges the cache so users always see fresh results.'|t('craft-algolia-accelerator') }}</p>
+    <p style="margin-top: 8px; color: #666;"><strong>{{ 'Performance:'|t('craft-algolia-accelerator') }}</strong> {{ 'Typical Algolia requests (300-500ms) are reduced to 2-10ms for cached responses.'|t('craft-algolia-accelerator') }}</p>
 </div>
 
 <hr>
 
 {{ forms.lightswitchField({
-    label: 'Enable Cache Purging'|t('algolia-accelerator'),
-    instructions: 'When enabled, the cache will be automatically purged when entries in the configured sections are saved.'|t('algolia-accelerator'),
+    label: 'Enable Cache Purging'|t('craft-algolia-accelerator'),
+    instructions: 'When enabled, the cache will be automatically purged when entries in the configured sections are saved.'|t('craft-algolia-accelerator'),
     id: 'enabled',
     name: 'enabled',
     on: settings.enabled,
@@ -18,40 +18,40 @@
 
 <hr>
 
-<h2>{{ 'Worker Configuration'|t('algolia-accelerator') }}</h2>
+<h2>{{ 'Worker Configuration'|t('craft-algolia-accelerator') }}</h2>
 
 <details style="margin-bottom: 24px; border: 1px solid #e5a54b; border-radius: 4px; background: #fef6e8;">
     <summary style="padding: 12px 16px; background: #fdf1db; cursor: pointer; font-weight: 600; color: #8a6d3b;">
-        {{ 'Prerequisite: DNS through Cloudflare'|t('algolia-accelerator') }}
+        {{ 'Prerequisite: DNS through Cloudflare'|t('craft-algolia-accelerator') }}
     </summary>
     <div style="padding: 16px; border-top: 1px solid #e5a54b;">
-        <p style="margin-top: 0;">{{ "Your domain's DNS must be managed by Cloudflare before setting up the worker. If you haven't already, add your domain to Cloudflare and update your nameservers."|t('algolia-accelerator') }}</p>
-        <p style="margin-bottom: 0;"><a href="https://dash.cloudflare.com/" target="_blank" class="go">{{ 'Open Cloudflare Dashboard'|t('algolia-accelerator') }}</a></p>
+        <p style="margin-top: 0;">{{ "Your domain's DNS must be managed by Cloudflare before setting up the worker. If you haven't already, add your domain to Cloudflare and update your nameservers."|t('craft-algolia-accelerator') }}</p>
+        <p style="margin-bottom: 0;"><a href="https://dash.cloudflare.com/" target="_blank" class="go">{{ 'Open Cloudflare Dashboard'|t('craft-algolia-accelerator') }}</a></p>
     </div>
 </details>
 
 <details style="margin-bottom: 24px; border: 1px solid #e0e0e0; border-radius: 4px;">
     <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
-        {{ 'Step-by-Step Cloudflare Setup (no CLI required)'|t('algolia-accelerator') }}
+        {{ 'Step-by-Step Cloudflare Setup (no CLI required)'|t('craft-algolia-accelerator') }}
     </summary>
     <div style="padding: 16px;">
-        <h4 style="margin-top: 0;">{{ 'Step 1: Create a KV Namespace (Cloudflare storage)'|t('algolia-accelerator') }}</h4>
+        <h4 style="margin-top: 0;">{{ 'Step 1: Create a KV Namespace (Cloudflare storage)'|t('craft-algolia-accelerator') }}</h4>
         <ol style="margin: 8px 0 16px 20px;">
-            <li>{{ 'Go to'|t('algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces" target="_blank">Workers & Pages → KV</a></li>
-            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Create a namespace</strong></li>
-            <li>{{ 'Name it'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ 'and click'|t('algolia-accelerator') }} <strong>Add</strong></li>
-            <li>{{ "You'll select this namespace in Step 3 when configuring KV bindings"|t('algolia-accelerator') }}</li>
+            <li>{{ 'Go to'|t('craft-algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces" target="_blank">Workers & Pages → KV</a></li>
+            <li>{{ 'Click'|t('craft-algolia-accelerator') }} <strong>Create a namespace</strong></li>
+            <li>{{ 'Name it'|t('craft-algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ 'and click'|t('craft-algolia-accelerator') }} <strong>Add</strong></li>
+            <li>{{ "You'll select this namespace in Step 3 when configuring KV bindings"|t('craft-algolia-accelerator') }}</li>
         </ol>
 
-        <h4>{{ 'Step 2: Create the Worker'|t('algolia-accelerator') }}</h4>
+        <h4>{{ 'Step 2: Create the Worker'|t('craft-algolia-accelerator') }}</h4>
         <ol style="margin: 8px 0 16px 20px;">
-            <li>{{ 'Go to'|t('algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers-and-pages/create/workers/new" target="_blank">Workers & Pages → Create</a></li>
-            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Create Worker</strong></li>
-            <li>{{ 'Name it'|t('algolia-accelerator') }} <code>algolia-cache-worker</code> {{ 'and click'|t('algolia-accelerator') }} <strong>Deploy</strong></li>
-            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Edit Code</strong></li>
-            <li>{{ 'Delete all the default code and paste the worker code below:'|t('algolia-accelerator') }}
+            <li>{{ 'Go to'|t('craft-algolia-accelerator') }} <a href="https://dash.cloudflare.com/?to=/:account/workers-and-pages/create/workers/new" target="_blank">Workers & Pages → Create</a></li>
+            <li>{{ 'Click'|t('craft-algolia-accelerator') }} <strong>Create Worker</strong></li>
+            <li>{{ 'Name it'|t('craft-algolia-accelerator') }} <code>algolia-cache-worker</code> {{ 'and click'|t('craft-algolia-accelerator') }} <strong>Deploy</strong></li>
+            <li>{{ 'Click'|t('craft-algolia-accelerator') }} <strong>Edit Code</strong></li>
+            <li>{{ 'Delete all the default code and paste the worker code below:'|t('craft-algolia-accelerator') }}
                 <p style="margin: 8px 0; font-size: 12px; color: #666;">
-                    <em>{{ 'Click inside the box to select all code, then copy (Ctrl+C / Cmd+C)'|t('algolia-accelerator') }}</em>
+                    <em>{{ 'Click inside the box to select all code, then copy (Ctrl+C / Cmd+C)'|t('craft-algolia-accelerator') }}</em>
                 </p>
                 <div style="margin-top: 8px;">
                     <textarea id="worker-code" readonly style="width: 100%; height: 300px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical; cursor: pointer;">{% verbatim %}/**
@@ -286,49 +286,49 @@ export default {
 };{% endverbatim %}</textarea>
                 </div>
             </li>
-            <li>{{ 'Click'|t('algolia-accelerator') }} <strong>Deploy</strong></li>
+            <li>{{ 'Click'|t('craft-algolia-accelerator') }} <strong>Deploy</strong></li>
         </ol>
 
-        <h4>{{ 'Step 3: Configure Worker Settings'|t('algolia-accelerator') }}</h4>
+        <h4>{{ 'Step 3: Configure Worker Settings'|t('craft-algolia-accelerator') }}</h4>
         <p style="margin: 8px 0; font-size: 13px; color: #666;">
-            {{ 'Get your Algolia credentials from'|t('algolia-accelerator') }} <a href="https://dashboard.algolia.com/account/api-keys" target="_blank">{{ 'Algolia Dashboard → API Keys'|t('algolia-accelerator') }}</a>
+            {{ 'Get your Algolia credentials from'|t('craft-algolia-accelerator') }} <a href="https://dashboard.algolia.com/account/api-keys" target="_blank">{{ 'Algolia Dashboard → API Keys'|t('craft-algolia-accelerator') }}</a>
         </p>
         <ol style="margin: 8px 0 16px 20px;">
-            <li>{{ 'In your Worker, go to'|t('algolia-accelerator') }} <strong>Settings → Variables</strong></li>
-            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Environment Variables</strong>, {{ 'add:'|t('algolia-accelerator') }}
+            <li>{{ 'In your Worker, go to'|t('craft-algolia-accelerator') }} <strong>Settings → Variables</strong></li>
+            <li>{{ 'Under'|t('craft-algolia-accelerator') }} <strong>Environment Variables</strong>, {{ 'add:'|t('craft-algolia-accelerator') }}
                 <ul style="margin: 8px 0 8px 20px;">
-                    <li><code>ALGOLIA_HOST</code> = <code>[Your-Algolia-App-ID]-dsn.algolia.net</code> <span style="color: #666;">({{ 'e.g.'|t('algolia-accelerator') }} <code>ABC123XYZ-dsn.algolia.net</code>)</span></li>
-                    <li><code>ALGOLIA_APP_ID</code> = {{ 'Your Algolia Application ID'|t('algolia-accelerator') }} <span style="color: #666;">({{ 'e.g.'|t('algolia-accelerator') }} <code>ABC123XYZ</code>)</span></li>
-                    <li><code>CACHE_TTL_SECONDS</code> = <code>86400</code> <span style="color: #666;">(24 {{ 'hours'|t('algolia-accelerator') }})</span></li>
+                    <li><code>ALGOLIA_HOST</code> = <code>[Your-Algolia-App-ID]-dsn.algolia.net</code> <span style="color: #666;">({{ 'e.g.'|t('craft-algolia-accelerator') }} <code>ABC123XYZ-dsn.algolia.net</code>)</span></li>
+                    <li><code>ALGOLIA_APP_ID</code> = {{ 'Your Algolia Application ID'|t('craft-algolia-accelerator') }} <span style="color: #666;">({{ 'e.g.'|t('craft-algolia-accelerator') }} <code>ABC123XYZ</code>)</span></li>
+                    <li><code>CACHE_TTL_SECONDS</code> = <code>86400</code> <span style="color: #666;">(24 {{ 'hours'|t('craft-algolia-accelerator') }})</span></li>
                 </ul>
             </li>
-            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Secrets</strong>, {{ 'add:'|t('algolia-accelerator') }}
+            <li>{{ 'Under'|t('craft-algolia-accelerator') }} <strong>Secrets</strong>, {{ 'add:'|t('craft-algolia-accelerator') }}
                 <ul style="margin: 8px 0 8px 20px;">
-                    <li><code>ALGOLIA_API_KEY</code> = {{ 'Your Algolia Search-Only API Key'|t('algolia-accelerator') }} <span style="color: #666;">({{ 'not the Admin key!'|t('algolia-accelerator') }})</span></li>
-                    <li><code>PURGE_TOKEN</code> = {{ 'A secure random string you create'|t('algolia-accelerator') }} <span style="color: #c00; font-weight: 600;">({{ 'save this - you need it below!'|t('algolia-accelerator') }})</span></li>
+                    <li><code>ALGOLIA_API_KEY</code> = {{ 'Your Algolia Search-Only API Key'|t('craft-algolia-accelerator') }} <span style="color: #666;">({{ 'not the Admin key!'|t('craft-algolia-accelerator') }})</span></li>
+                    <li><code>PURGE_TOKEN</code> = {{ 'A secure random string you create'|t('craft-algolia-accelerator') }} <span style="color: #c00; font-weight: 600;">({{ 'save this - you need it below!'|t('craft-algolia-accelerator') }})</span></li>
                 </ul>
             </li>
-            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>KV Namespace Bindings</strong>, {{ 'add:'|t('algolia-accelerator') }}
+            <li>{{ 'Under'|t('craft-algolia-accelerator') }} <strong>KV Namespace Bindings</strong>, {{ 'add:'|t('craft-algolia-accelerator') }}
                 <ul style="margin: 8px 0 8px 20px;">
-                    <li>{{ 'Variable name:'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code></li>
-                    <li>{{ 'KV namespace:'|t('algolia-accelerator') }} {{ 'Select'|t('algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ '(the namespace you created in Step 1)'|t('algolia-accelerator') }}</li>
+                    <li>{{ 'Variable name:'|t('craft-algolia-accelerator') }} <code>SEARCH_CACHE</code></li>
+                    <li>{{ 'KV namespace:'|t('craft-algolia-accelerator') }} {{ 'Select'|t('craft-algolia-accelerator') }} <code>SEARCH_CACHE</code> {{ '(the namespace you created in Step 1)'|t('craft-algolia-accelerator') }}</li>
                 </ul>
             </li>
         </ol>
 
-        <h4>{{ 'Step 4: Add a Custom Domain (Recommended)'|t('algolia-accelerator') }}</h4>
+        <h4>{{ 'Step 4: Add a Custom Domain (Recommended)'|t('craft-algolia-accelerator') }}</h4>
         <ol style="margin: 8px 0 16px 20px;">
-            <li>{{ 'In your Worker, go to'|t('algolia-accelerator') }} <strong>Settings → Triggers</strong></li>
-            <li>{{ 'Under'|t('algolia-accelerator') }} <strong>Custom Domains</strong>, {{ 'click'|t('algolia-accelerator') }} <strong>Add Custom Domain</strong></li>
-            <li>{{ 'Enter a subdomain like'|t('algolia-accelerator') }} <code>search-api.yourdomain.com</code></li>
-            <li>{{ 'This subdomain becomes your'|t('algolia-accelerator') }} <strong>Worker Host</strong> {{ 'below'|t('algolia-accelerator') }}</li>
+            <li>{{ 'In your Worker, go to'|t('craft-algolia-accelerator') }} <strong>Settings → Triggers</strong></li>
+            <li>{{ 'Under'|t('craft-algolia-accelerator') }} <strong>Custom Domains</strong>, {{ 'click'|t('craft-algolia-accelerator') }} <strong>Add Custom Domain</strong></li>
+            <li>{{ 'Enter a subdomain like'|t('craft-algolia-accelerator') }} <code>search-api.yourdomain.com</code></li>
+            <li>{{ 'This subdomain becomes your'|t('craft-algolia-accelerator') }} <strong>Worker Host</strong> {{ 'below'|t('craft-algolia-accelerator') }}</li>
         </ol>
 
         <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; margin-top: 16px;">
-            <strong>{{ "You're done!"|t('algolia-accelerator') }}</strong> {{ 'Now enter your values below:'|t('algolia-accelerator') }}
+            <strong>{{ "You're done!"|t('craft-algolia-accelerator') }}</strong> {{ 'Now enter your values below:'|t('craft-algolia-accelerator') }}
             <ul style="margin: 8px 0 0 20px;">
-                <li><strong>Worker Host</strong> = {{ 'Your custom domain or'|t('algolia-accelerator') }} <code>algolia-cache-worker.YOUR-SUBDOMAIN.workers.dev</code></li>
-                <li><strong>Purge Token</strong> = {{ 'The secret you created in Step 3'|t('algolia-accelerator') }}</li>
+                <li><strong>Worker Host</strong> = {{ 'Your custom domain or'|t('craft-algolia-accelerator') }} <code>algolia-cache-worker.YOUR-SUBDOMAIN.workers.dev</code></li>
+                <li><strong>Purge Token</strong> = {{ 'The secret you created in Step 3'|t('craft-algolia-accelerator') }}</li>
             </ul>
         </div>
     </div>
@@ -336,8 +336,8 @@ export default {
 
 
 {{ forms.textField({
-    label: 'Worker Host'|t('algolia-accelerator'),
-    instructions: 'The hostname of your Cloudflare Worker. This is the <code>*.workers.dev</code> URL or custom domain from Cloudflare.'|t('algolia-accelerator')|raw,
+    label: 'Worker Host'|t('craft-algolia-accelerator'),
+    instructions: 'The hostname of your Cloudflare Worker. This is the <code>*.workers.dev</code> URL or custom domain from Cloudflare.'|t('craft-algolia-accelerator')|raw,
     id: 'workerHost',
     name: 'workerHost',
     value: settings.workerHost,
@@ -346,8 +346,8 @@ export default {
 }) }}
 
 {{ forms.passwordField({
-    label: 'Purge Token'|t('algolia-accelerator'),
-    instructions: 'The secure token you created and added as a Secret in your Cloudflare Worker settings (Settings → Variables → Secrets → PURGE_TOKEN).'|t('algolia-accelerator'),
+    label: 'Purge Token'|t('craft-algolia-accelerator'),
+    instructions: 'The secure token you created and added as a Secret in your Cloudflare Worker settings (Settings → Variables → Secrets → PURGE_TOKEN).'|t('craft-algolia-accelerator'),
     id: 'purgeToken',
     name: 'purgeToken',
     value: settings.purgeToken,
@@ -357,11 +357,11 @@ export default {
 
 <hr>
 
-<h2>{{ 'Cache Triggers'|t('algolia-accelerator') }}</h2>
+<h2>{{ 'Cache Triggers'|t('craft-algolia-accelerator') }}</h2>
 
 {{ forms.checkboxSelectField({
-    label: 'Trigger Sections'|t('algolia-accelerator'),
-    instructions: 'Select which sections should trigger a cache purge when entries are saved.'|t('algolia-accelerator'),
+    label: 'Trigger Sections'|t('craft-algolia-accelerator'),
+    instructions: 'Select which sections should trigger a cache purge when entries are saved.'|t('craft-algolia-accelerator'),
     id: 'triggerSections',
     name: 'triggerSections',
     options: sectionOptions,
@@ -370,11 +370,11 @@ export default {
 
 <hr>
 
-<h2>{{ 'Cache Settings'|t('algolia-accelerator') }}</h2>
+<h2>{{ 'Cache Settings'|t('craft-algolia-accelerator') }}</h2>
 
 {{ forms.textField({
-    label: 'Cache TTL (seconds)'|t('algolia-accelerator'),
-    instructions: 'Informational only - the actual TTL is configured in the Cloudflare Worker. Default: 86400 (24 hours)'|t('algolia-accelerator'),
+    label: 'Cache TTL (seconds)'|t('craft-algolia-accelerator'),
+    instructions: 'Informational only - the actual TTL is configured in the Cloudflare Worker. Default: 86400 (24 hours)'|t('craft-algolia-accelerator'),
     id: 'cacheTtl',
     name: 'cacheTtl',
     value: settings.cacheTtl,
@@ -385,17 +385,17 @@ export default {
 
 <hr>
 
-<h2>{{ 'Frontend Integration'|t('algolia-accelerator') }}</h2>
+<h2>{{ 'Frontend Integration'|t('craft-algolia-accelerator') }}</h2>
 
 <div class="readable">
-    <p>{{ 'To use the cache, your frontend must send search requests to the Cloudflare Worker instead of directly to Algolia. The worker URL follows the same API structure as Algolia, so you only need to change the host.'|t('algolia-accelerator') }}</p>
+    <p>{{ 'To use the cache, your frontend must send search requests to the Cloudflare Worker instead of directly to Algolia. The worker URL follows the same API structure as Algolia, so you only need to change the host.'|t('craft-algolia-accelerator') }}</p>
 
     <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
         <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
-            {{ 'InstantSearch.js / Vue InstantSearch / React InstantSearch'|t('algolia-accelerator') }}
+            {{ 'InstantSearch.js / Vue InstantSearch / React InstantSearch'|t('craft-algolia-accelerator') }}
         </summary>
         <div style="padding: 16px;">
-            <p style="margin-top: 0;">{{ 'Create a custom search client that routes requests through your worker:'|t('algolia-accelerator') }}</p>
+            <p style="margin-top: 0;">{{ 'Create a custom search client that routes requests through your worker:'|t('craft-algolia-accelerator') }}</p>
             <textarea readonly style="width: 100%; height: 220px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">// Replace 'search-api.yourdomain.com' with your Worker Host
 const WORKER_HOST = 'https://search-api.yourdomain.com';
 
@@ -423,10 +423,10 @@ const search = instantsearch({
 
     <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
         <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
-            {{ 'Autocomplete.js'|t('algolia-accelerator') }}
+            {{ 'Autocomplete.js'|t('craft-algolia-accelerator') }}
         </summary>
         <div style="padding: 16px;">
-            <p style="margin-top: 0;">{{ 'For Algolia Autocomplete, create a custom requester:'|t('algolia-accelerator') }}</p>
+            <p style="margin-top: 0;">{{ 'For Algolia Autocomplete, create a custom requester:'|t('craft-algolia-accelerator') }}</p>
             <textarea readonly style="width: 100%; height: 280px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js';
 
 const WORKER_HOST = 'https://search-api.yourdomain.com';
@@ -462,10 +462,10 @@ autocomplete({
 
     <details style="margin: 16px 0; border: 1px solid #e0e0e0; border-radius: 4px;">
         <summary style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; font-weight: 600;">
-            {{ 'Direct API Calls (fetch/axios)'|t('algolia-accelerator') }}
+            {{ 'Direct API Calls (fetch/axios)'|t('craft-algolia-accelerator') }}
         </summary>
         <div style="padding: 16px;">
-            <p style="margin-top: 0;">{{ 'If you make direct API calls, simply change the endpoint:'|t('algolia-accelerator') }}</p>
+            <p style="margin-top: 0;">{{ 'If you make direct API calls, simply change the endpoint:'|t('craft-algolia-accelerator') }}</p>
             <textarea readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; padding: 12px; background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; resize: vertical;" onclick="this.select();">// Before (direct to Algolia):
 // const url = 'https://ABC123-dsn.algolia.net/1/indexes/*/queries';
 
@@ -487,16 +487,16 @@ const data = await response.json();
     </details>
 
     <div style="background: #e3f2fd; padding: 12px 16px; border-radius: 4px; margin-top: 16px;">
-        <p style="margin: 0;"><strong>{{ 'Key Point:'|t('algolia-accelerator') }}</strong> {{ 'The Cloudflare Worker acts as a transparent proxy. Your frontend code stays almost identical - you only change the host URL. The worker handles authentication with Algolia automatically using the credentials you configured.'|t('algolia-accelerator') }}</p>
+        <p style="margin: 0;"><strong>{{ 'Key Point:'|t('craft-algolia-accelerator') }}</strong> {{ 'The Cloudflare Worker acts as a transparent proxy. Your frontend code stays almost identical - you only change the host URL. The worker handles authentication with Algolia automatically using the credentials you configured.'|t('craft-algolia-accelerator') }}</p>
     </div>
 
     <div style="margin-top: 16px;">
-        <h4 style="margin-bottom: 8px;">{{ 'Verifying Cache Performance'|t('algolia-accelerator') }}</h4>
-        <p style="margin: 0;">{{ 'Check the response headers in your browser DevTools (Network tab) to verify caching is working:'|t('algolia-accelerator') }}</p>
+        <h4 style="margin-bottom: 8px;">{{ 'Verifying Cache Performance'|t('craft-algolia-accelerator') }}</h4>
+        <p style="margin: 0;">{{ 'Check the response headers in your browser DevTools (Network tab) to verify caching is working:'|t('craft-algolia-accelerator') }}</p>
         <ul style="margin: 8px 0 0 20px;">
-            <li><code>X-Cache: HIT</code> = {{ 'Response served from cache (fast, 2-10ms)'|t('algolia-accelerator') }}</li>
-            <li><code>X-Cache: MISS</code> = {{ 'Fresh response from Algolia (slower, 300-500ms)'|t('algolia-accelerator') }}</li>
-            <li><code>X-Response-Time</code> = {{ 'Actual request duration'|t('algolia-accelerator') }}</li>
+            <li><code>X-Cache: HIT</code> = {{ 'Response served from cache (fast, 2-10ms)'|t('craft-algolia-accelerator') }}</li>
+            <li><code>X-Cache: MISS</code> = {{ 'Fresh response from Algolia (slower, 300-500ms)'|t('craft-algolia-accelerator') }}</li>
+            <li><code>X-Response-Time</code> = {{ 'Actual request duration'|t('craft-algolia-accelerator') }}</li>
         </ul>
     </div>
 </div>
@@ -505,7 +505,7 @@ const data = await response.json();
 
 <div class="readable">
     <blockquote class="note tip">
-        <p><strong>{{ 'Tip:'|t('algolia-accelerator') }}</strong> {{ 'Use the'|t('algolia-accelerator') }} <a href="{{ cpUrl('utilities/algolia-accelerator') }}">{{ 'Algolia Accelerator utility'|t('algolia-accelerator') }}</a> {{ 'to manually purge the cache and check worker status.'|t('algolia-accelerator') }}</p>
+        <p><strong>{{ 'Tip:'|t('craft-algolia-accelerator') }}</strong> {{ 'Use the'|t('craft-algolia-accelerator') }} <a href="{{ cpUrl('utilities/craft-algolia-accelerator') }}">{{ 'Algolia Accelerator utility'|t('craft-algolia-accelerator') }}</a> {{ 'to manually purge the cache and check worker status.'|t('craft-algolia-accelerator') }}</p>
     </blockquote>
 </div>
 

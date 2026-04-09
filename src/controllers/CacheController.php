@@ -21,7 +21,7 @@ class CacheController extends Controller
     {
         $this->requirePostRequest();
         $this->requireCpRequest();
-        $this->requirePermission('utility:algolia-accelerator');
+        $this->requirePermission('utility:craft-algolia-accelerator');
 
         $enabled = $this->request->getBodyParam('enabled');
 
@@ -38,7 +38,7 @@ class CacheController extends Controller
 
         return $this->asJson([
             'success' => false,
-            'message' => Craft::t('algolia-accelerator', 'Failed to save settings'),
+            'message' => Craft::t('craft-algolia-accelerator', 'Failed to save settings'),
         ]);
     }
 
@@ -49,7 +49,7 @@ class CacheController extends Controller
     {
         $this->requirePostRequest();
         $this->requireCpRequest();
-        $this->requirePermission('utility:algolia-accelerator');
+        $this->requirePermission('utility:craft-algolia-accelerator');
 
         $plugin = AlgoliaAccelerator::getInstance();
         $result = $plugin->cachePurge->purgeCache('manual (CP utility)');
@@ -57,13 +57,13 @@ class CacheController extends Controller
         if ($result) {
             return $this->asJson([
                 'success' => true,
-                'message' => Craft::t('algolia-accelerator', 'Cache purged successfully'),
+                'message' => Craft::t('craft-algolia-accelerator', 'Cache purged successfully'),
             ]);
         }
 
         return $this->asJson([
             'success' => false,
-            'message' => Craft::t('algolia-accelerator', 'Failed to purge cache. Check the logs for details.'),
+            'message' => Craft::t('craft-algolia-accelerator', 'Failed to purge cache. Check the logs for details.'),
         ]);
     }
 
@@ -73,7 +73,7 @@ class CacheController extends Controller
     public function actionStatus(): Response
     {
         $this->requireCpRequest();
-        $this->requirePermission('utility:algolia-accelerator');
+        $this->requirePermission('utility:craft-algolia-accelerator');
 
         $plugin = AlgoliaAccelerator::getInstance();
         $status = $plugin->cachePurge->getWorkerStatus();

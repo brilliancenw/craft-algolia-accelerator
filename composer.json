@@ -38,8 +38,8 @@
     }
   },
   "extra": {
-    "name": "Algolia Accelerator",
-    "handle": "algolia-accelerator",
+    "name": "Craft Algolia Accelerator",
+    "handle": "craft-algolia-accelerator",
     "hasCpSettings": true,
     "hasCpSection": false,
     "class": "brilliance\\algoliaaccelerator\\AlgoliaAccelerator",
