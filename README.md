@@ -1,8 +1,6 @@
 # Craft Algolia Accelerator
 
-A Cloudflare-powered caching layer for Algolia search that dramatically improves performance.
-
-**Performance Impact**: 300-500ms Algolia requests reduced to 2-10ms (cache hits)
+A Cloudflare-powered caching layer for Algolia search with automatic cache purging.
 
 ## Overview
 

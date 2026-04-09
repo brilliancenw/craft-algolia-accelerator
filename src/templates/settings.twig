@@ -1,9 +1,8 @@
 {% import '_includes/forms.twig' as forms %}
 
 <div class="readable" style="margin-bottom: 24px;">
-    <p>{{ 'Algolia Accelerator dramatically improves search performance by caching Algolia responses at the edge using Cloudflare Workers.'|t('craft-algolia-accelerator') }}</p>
+    <p>{{ 'Craft Algolia Accelerator caches Algolia responses at the edge using Cloudflare Workers.'|t('craft-algolia-accelerator') }}</p>
     <p style="margin-bottom: 0;"><strong>{{ 'How it works:'|t('craft-algolia-accelerator') }}</strong> {{ 'A Cloudflare Worker sits between your frontend and Algolia, caching search responses in Cloudflare KV storage. When content changes in Craft, this plugin automatically purges the cache so users always see fresh results.'|t('craft-algolia-accelerator') }}</p>
-    <p style="margin-top: 8px; color: #666;"><strong>{{ 'Performance:'|t('craft-algolia-accelerator') }}</strong> {{ 'Typical Algolia requests (300-500ms) are reduced to 2-10ms for cached responses.'|t('craft-algolia-accelerator') }}</p>
 </div>
 
 <hr>
@@ -59,9 +58,7 @@
  *
  * Cloudflare Worker that acts as a caching proxy for Algolia search requests.
  * Caches search responses in Cloudflare KV with a configurable TTL to reduce
- * API costs and dramatically improve performance.
- *
- * Response times: ~300-500ms (cache miss) -> ~2-10ms (cache hit)
+ * API costs and improve performance.
  */
 
 export interface Env {
@@ -494,8 +491,8 @@ const data = await response.json();
         <h4 style="margin-bottom: 8px;">{{ 'Verifying Cache Performance'|t('craft-algolia-accelerator') }}</h4>
         <p style="margin: 0;">{{ 'Check the response headers in your browser DevTools (Network tab) to verify caching is working:'|t('craft-algolia-accelerator') }}</p>
         <ul style="margin: 8px 0 0 20px;">
-            <li><code>X-Cache: HIT</code> = {{ 'Response served from cache (fast, 2-10ms)'|t('craft-algolia-accelerator') }}</li>
-            <li><code>X-Cache: MISS</code> = {{ 'Fresh response from Algolia (slower, 300-500ms)'|t('craft-algolia-accelerator') }}</li>
+            <li><code>X-Cache: HIT</code> = {{ 'Response served from cache (fast)'|t('craft-algolia-accelerator') }}</li>
+            <li><code>X-Cache: MISS</code> = {{ 'Response fetched from Algolia and cached'|t('craft-algolia-accelerator') }}</li>
             <li><code>X-Response-Time</code> = {{ 'Actual request duration'|t('craft-algolia-accelerator') }}</li>
         </ul>
     </div>

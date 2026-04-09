@@ -3,9 +3,7 @@
  *
  * Cloudflare Worker that acts as a caching proxy for Algolia search requests.
  * Caches search responses in Cloudflare KV with a configurable TTL to reduce
- * API costs and dramatically improve performance.
- *
- * Response times: ~300-500ms (cache miss) -> ~2-10ms (cache hit)
+ * API costs and improve performance.
  */
 
 export interface Env {
