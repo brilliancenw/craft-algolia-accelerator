@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-04-09
+## [1.0.0-alpha.1] - 2025-04-09
 
 ### Added
 
-- Initial release
+- Initial alpha release (not for production use)
 - **Cloudflare Worker** with KV-backed response caching
   - FNV-1a hash-based cache keys for deterministic lookups
   - Configurable cache TTL (default 24 hours)
